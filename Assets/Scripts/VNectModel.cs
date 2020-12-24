@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,7 +57,7 @@ public static partial class EnumExtend
 
 public class VNectModel : MonoBehaviour
 {
-
+    [Serializable]
     public class JointPoint
     {
         public Vector2 Pos2D = new Vector2();
@@ -103,7 +103,7 @@ public class VNectModel : MonoBehaviour
     public float SkeletonScale;
 
     // Joint position and bone
-    private JointPoint[] jointPoints;
+    public JointPoint[] jointPoints;
     public JointPoint[] JointPoints { get { return jointPoints; } }
 
     private Vector3 initPosition; // Initial center position
