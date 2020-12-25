@@ -4,7 +4,6 @@ using UnityEngine.Video;
 
 public class VideoCapture : MonoBehaviour
 {
-    public GameObject InputTexture;
     public RawImage VideoScreen;
     public GameObject VideoBackground;
     public float VideoBackgroundScale;
@@ -120,6 +119,5 @@ public class VideoCapture : MonoBehaviour
         };
 
         camera.targetTexture = MainTexture;
-        if (InputTexture.activeSelf) InputTexture.GetComponent<Renderer>().material.mainTexture = MainTexture;
     }
 }
