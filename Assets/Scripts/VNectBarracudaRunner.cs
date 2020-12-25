@@ -132,8 +132,7 @@ public class VNectBarracudaRunner : MonoBehaviour
     public float LowPassParam;
 
     public float WaitTimeModelLoad = 10f;
-    private float Countdown = 0;
-    public Texture2D InitImg;
+    public Texture2D baseTexture;
 
     private void Start()
     {
@@ -166,7 +165,7 @@ public class VNectBarracudaRunner : MonoBehaviour
 
     private void Update()
     {
-        if (!Lock)
+        if( !Lock )
         {
             UpdateVNectModel();
         }
@@ -174,15 +173,15 @@ public class VNectBarracudaRunner : MonoBehaviour
 
     private IEnumerator WaitLoad()
     {
-        inputs[inputName_1] = new Tensor(InitImg);
-        inputs[inputName_2] = new Tensor(InitImg);
-        inputs[inputName_3] = new Tensor(InitImg);
+        inputs[inputName_1] = new Tensor(baseTexture);
+        inputs[inputName_2] = new Tensor(baseTexture);
+        inputs[inputName_3] = new Tensor(baseTexture);
 
         // Create input and Execute model
         yield return _worker.StartManualSchedule(inputs);
 
         // Get outputs
-        for (var i = 2; i < _model.outputs.Count; i++)
+        for( int i = 2; i < _model.outputs.Count; i++ )
         {
             b_outputs[i] = _worker.PeekOutput(_model.outputs[i]);
         }
@@ -192,7 +191,7 @@ public class VNectBarracudaRunner : MonoBehaviour
         heatMap3D = b_outputs[3].data.Download(b_outputs[3].shape);
 
         // Release outputs
-        for (var i = 2; i < b_outputs.Length; i++)
+        for( int i = 2; i < b_outputs.Length; i++ )
         {
             b_outputs[i].Dispose();
         }
@@ -205,7 +204,7 @@ public class VNectBarracudaRunner : MonoBehaviour
         yield return new WaitForSeconds(WaitTimeModelLoad);
 
         // Init VideoCapture
-        videoCapture.Init(InputImageSize, InputImageSize);
+        videoCapture.Initialize(InputImageSize, InputImageSize);
         Lock = false;
     }
 
@@ -220,12 +219,12 @@ public class VNectBarracudaRunner : MonoBehaviour
 
     private void UpdateVNectModel()
     {
-        input = new Tensor(videoCapture.MainTexture);
-        if (inputs[inputName_1] == null)
+        input = new Tensor(videoCapture.renderTexture);
+        if( inputs[inputName_1] == null )
         {
             inputs[inputName_1] = input;
-            inputs[inputName_2] = new Tensor(videoCapture.MainTexture);
-            inputs[inputName_3] = new Tensor(videoCapture.MainTexture);
+            inputs[inputName_2] = new Tensor(videoCapture.renderTexture);
+            inputs[inputName_3] = new Tensor(videoCapture.renderTexture);
         }
         else
         {
@@ -253,7 +252,7 @@ public class VNectBarracudaRunner : MonoBehaviour
         yield return _worker.StartManualSchedule(inputs);
 
         // Get outputs
-        for (var i = 2; i < _model.outputs.Count; i++)
+        for( int i = 2; i < _model.outputs.Count; i++ )
         {
             b_outputs[i] = _worker.PeekOutput(_model.outputs[i]);
         }
@@ -263,7 +262,7 @@ public class VNectBarracudaRunner : MonoBehaviour
         heatMap3D = b_outputs[3].data.Download(b_outputs[3].shape);
         
         // Release outputs
-        for (var i = 2; i < b_outputs.Length; i++)
+        for( int i = 2; i < b_outputs.Length; i++ )
         {
             b_outputs[i].Dispose();
         }
@@ -276,23 +275,23 @@ public class VNectBarracudaRunner : MonoBehaviour
     /// </summary>
     private void PredictPose()
     {
-        for (var j = 0; j < JointNum; j++)
+        for( int j = 0; j < JointNum; j++ )
         {
             var maxXIndex = 0;
             var maxYIndex = 0;
             var maxZIndex = 0;
             jointPoints[j].score3D = 0.0f;
             var jj = j * HeatMapCol;
-            for (var z = 0; z < HeatMapCol; z++)
+            for( int z = 0; z < HeatMapCol; z++ )
             {
                 var zz = jj + z;
-                for (var y = 0; y < HeatMapCol; y++)
+                for( int y = 0; y < HeatMapCol; y++ )
                 {
                     var yy = y * HeatMapCol_Squared * JointNum + zz;
-                    for (var x = 0; x < HeatMapCol; x++)
+                    for( int x = 0; x < HeatMapCol; x++ )
                     {
                         float v = heatMap3D[yy + x * HeatMapCol_JointNum];
-                        if (v > jointPoints[j].score3D)
+                        if( v > jointPoints[j].score3D )
                         {
                             jointPoints[j].score3D = v;
                             maxXIndex = x;
@@ -326,21 +325,22 @@ public class VNectBarracudaRunner : MonoBehaviour
         jointPoints[PositionIndex.spine.Int()].Now3D = jointPoints[PositionIndex.abdomenUpper.Int()].Now3D;
 
         // Kalman filter
-        foreach (var jp in jointPoints)
+        foreach( VNectModel.JointPoint jp in jointPoints )
         {
             KalmanUpdate(jp);
         }
 
         // Low pass filter
-        if (UseLowPassFilter)
+        if( UseLowPassFilter )
         {
-            foreach (var jp in jointPoints)
+            foreach( VNectModel.JointPoint jp in jointPoints )
             {
                 jp.PrevPos3D[0] = jp.Pos3D;
-                for (var i = 1; i < jp.PrevPos3D.Length; i++)
+                for( int i = 1; i < jp.PrevPos3D.Length; i++ )
                 {
                     jp.PrevPos3D[i] = jp.PrevPos3D[i] * LowPassParam + jp.PrevPos3D[i - 1] * (1f - LowPassParam);
                 }
+
                 jp.Pos3D = jp.PrevPos3D[jp.PrevPos3D.Length - 1];
             }
         }
@@ -350,7 +350,7 @@ public class VNectBarracudaRunner : MonoBehaviour
     /// Kalman filter
     /// </summary>
     /// <param name="measurement">joint points</param>
-    void KalmanUpdate(VNectModel.JointPoint measurement)
+    void KalmanUpdate( VNectModel.JointPoint measurement )
     {
         measurementUpdate(measurement);
         measurement.Pos3D.x = measurement.X.x + (measurement.Now3D.x - measurement.X.x) * measurement.K.x;
@@ -359,7 +359,7 @@ public class VNectBarracudaRunner : MonoBehaviour
         measurement.X = measurement.Pos3D;
     }
 
-	void measurementUpdate(VNectModel.JointPoint measurement)
+	void measurementUpdate( VNectModel.JointPoint measurement )
     {
         measurement.K.x = (measurement.P.x + KalmanParamQ) / (measurement.P.x + KalmanParamQ + KalmanParamR);
         measurement.K.y = (measurement.P.y + KalmanParamQ) / (measurement.P.y + KalmanParamQ + KalmanParamR);

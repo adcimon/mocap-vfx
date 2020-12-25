@@ -49,7 +49,7 @@ public enum PositionIndex : int
 
 public static partial class EnumExtend
 {
-    public static int Int(this PositionIndex i)
+    public static int Int( this PositionIndex i )
     {
         return (int)i;
     }
@@ -124,7 +124,7 @@ public class VNectModel : MonoBehaviour
 
     private void Update()
     {
-        if (jointPoints != null)
+        if( jointPoints != null )
         {
             PoseUpdate();
         }
@@ -137,7 +137,10 @@ public class VNectModel : MonoBehaviour
     public JointPoint[] Init()
     {
         jointPoints = new JointPoint[PositionIndex.Count.Int()];
-        for (var i = 0; i < PositionIndex.Count.Int(); i++) jointPoints[i] = new JointPoint();
+        for( int i = 0; i < PositionIndex.Count.Int(); i++ )
+        {
+            jointPoints[i] = new JointPoint();
+        }
 
         anim = ModelObject.GetComponent<Animator>();
 
@@ -211,7 +214,7 @@ public class VNectModel : MonoBehaviour
         //jointPoints[PositionIndex.head.Int()].Child = jointPoints[PositionIndex.Nose.Int()];
 
         useSkeleton = ShowSkeleton;
-        if (useSkeleton)
+        if( useSkeleton )
         {
             // Line Child Settings
             // Right Arm
@@ -257,19 +260,20 @@ public class VNectModel : MonoBehaviour
 
         // Set Inverse
         var forward = TriangleNormal(jointPoints[PositionIndex.hip.Int()].Transform.position, jointPoints[PositionIndex.lThighBend.Int()].Transform.position, jointPoints[PositionIndex.rThighBend.Int()].Transform.position);
-        foreach (var jointPoint in jointPoints)
+        foreach( JointPoint jointPoint in jointPoints )
         {
-            if (jointPoint.Transform != null)
+            if( jointPoint.Transform != null )
             {
                 jointPoint.InitRotation = jointPoint.Transform.rotation;
             }
 
-            if (jointPoint.Child != null)
+            if( jointPoint.Child != null )
             {
                 jointPoint.Inverse = GetInverse(jointPoint, jointPoint.Child, forward);
                 jointPoint.InverseRotation = jointPoint.Inverse * jointPoint.InitRotation;
             }
         }
+
         var hip = jointPoints[PositionIndex.hip.Int()];
         initPosition = jointPoints[PositionIndex.hip.Int()].Transform.position;
         hip.Inverse = Quaternion.Inverse(Quaternion.LookRotation(forward));
@@ -319,15 +323,15 @@ public class VNectModel : MonoBehaviour
         var t5 = (t5r + t5l) / 2f;
         var t = t1 + t2 + t3 + t4 + t5;
 
-
         // Low pass filter in z direction
         tall = t * 0.7f + prevTall * 0.3f;
         prevTall = tall;
 
-        if (tall == 0)
+        if( tall == 0 )
         {
             tall = centerTall;
         }
+
         var dz = (centerTall - tall) / centerTall * ZScale;
 
         // movement and rotatation of center
@@ -336,14 +340,14 @@ public class VNectModel : MonoBehaviour
         jointPoints[PositionIndex.hip.Int()].Transform.rotation = Quaternion.LookRotation(forward) * jointPoints[PositionIndex.hip.Int()].InverseRotation;
 
         // rotate each of bones
-        foreach (var jointPoint in jointPoints)
+        foreach( JointPoint jointPoint in jointPoints )
         {
-            if (jointPoint.Parent != null)
+            if( jointPoint.Parent != null )
             {
                 var fv = jointPoint.Parent.Pos3D - jointPoint.Pos3D;
                 jointPoint.Transform.rotation = Quaternion.LookRotation(jointPoint.Pos3D - jointPoint.Child.Pos3D, fv) * jointPoint.InverseRotation;
             }
-            else if (jointPoint.Child != null)
+            else if( jointPoint.Child != null )
             {
                 jointPoint.Transform.rotation = Quaternion.LookRotation(jointPoint.Pos3D - jointPoint.Child.Pos3D, forward) * jointPoint.InverseRotation;
             }
@@ -365,7 +369,7 @@ public class VNectModel : MonoBehaviour
         //rHand.Transform.rotation = Quaternion.LookRotation(jointPoints[PositionIndex.rThumb2.Int()].Pos3D - jointPoints[PositionIndex.rMid1.Int()].Pos3D, rf) * rHand.InverseRotation;
         rHand.Transform.rotation = Quaternion.LookRotation(jointPoints[PositionIndex.rThumb2.Int()].Pos3D - jointPoints[PositionIndex.rMid1.Int()].Pos3D, rf) * rHand.InverseRotation;
 
-        foreach (var sk in Skeletons)
+        foreach( Skeleton sk in Skeletons )
         {
             var s = sk.start;
             var e = sk.end;
@@ -375,7 +379,7 @@ public class VNectModel : MonoBehaviour
         }
     }
 
-    Vector3 TriangleNormal(Vector3 a, Vector3 b, Vector3 c)
+    Vector3 TriangleNormal( Vector3 a, Vector3 b, Vector3 c )
     {
         Vector3 d1 = a - b;
         Vector3 d2 = a - c;
@@ -386,7 +390,7 @@ public class VNectModel : MonoBehaviour
         return dd;
     }
 
-    private Quaternion GetInverse(JointPoint p1, JointPoint p2, Vector3 forward)
+    private Quaternion GetInverse( JointPoint p1, JointPoint p2, Vector3 forward )
     {
         return Quaternion.Inverse(Quaternion.LookRotation(p1.Transform.position - p2.Transform.position, forward));
     }
@@ -396,7 +400,7 @@ public class VNectModel : MonoBehaviour
     /// </summary>
     /// <param name="s">position index</param>
     /// <param name="e">position index</param>
-    private void AddSkeleton(PositionIndex s, PositionIndex e)
+    private void AddSkeleton( PositionIndex s, PositionIndex e )
     {
         var sk = new Skeleton()
         {
