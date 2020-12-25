@@ -16,10 +16,6 @@ public class VNectBarracudaRunner : MonoBehaviour
     public WorkerFactory.Type WorkerType = WorkerFactory.Type.Auto;
     public bool Verbose = true;
 
-    public VNectModel VNectModel;
-
-    public VideoCapture videoCapture;
-
     private Model _model;
     private IWorker _worker;
 
@@ -133,6 +129,8 @@ public class VNectBarracudaRunner : MonoBehaviour
 
     public float WaitTimeModelLoad = 10f;
     public Texture2D baseTexture;
+    public VideoCapture videoCapture;
+    public VNectModel VNectModel;
 
     private void Start()
     {
@@ -197,7 +195,7 @@ public class VNectBarracudaRunner : MonoBehaviour
         }
 
         // Init VNect model
-        jointPoints = VNectModel.Init();
+        jointPoints = VNectModel.Initialize();
 
         PredictPose();
 

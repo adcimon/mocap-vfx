@@ -633,8 +633,6 @@ MonoBehaviour:
   NNModel: {fileID: 5022602860645237092, guid: 03c27c5acf3dfb5489d6b32d68546daa, type: 3}
   WorkerType: 32768
   Verbose: 0
-  VNectModel: {fileID: 1915073380}
-  videoCapture: {fileID: 1873549733}
   InputImageSize: 448
   HeatMapCol: 28
   KalmanParamQ: 0.001
@@ -643,6 +641,8 @@ MonoBehaviour:
   LowPassParam: 0.1
   WaitTimeModelLoad: 5
   baseTexture: {fileID: 2800000, guid: 7322ccd0ff5309147a9faf5de7a100ae, type: 3}
+  videoCapture: {fileID: 1873549733}
+  VNectModel: {fileID: 1915073380}
 --- !u!4 &1875476001
 Transform:
   m_ObjectHideFlags: 0
@@ -774,14 +774,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3558338e378282c4a91d1a3356b57301, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SkeletonMaterial: {fileID: 2100000, guid: f8188c9479a7aad41b7448fe5eeed839, type: 2}
-  ShowSkeleton: 1
+  showSkeleton: 1
+  skeletonMaterial: {fileID: 2100000, guid: f8188c9479a7aad41b7448fe5eeed839, type: 2}
   SkeletonX: -1
   SkeletonY: 0.9
   SkeletonZ: 0
   SkeletonScale: 0.006
   jointPoints: []
-  ModelObject: {fileID: 1915073379}
   Nose: {fileID: 979812784}
   ZScale: 1
 --- !u!1 &2007224354
