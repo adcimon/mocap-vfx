@@ -47,7 +47,7 @@ public class VideoCapture : MonoBehaviour
         
         webCamTexture = new WebCamTexture(devices[WebCamIndex].name);
 
-        var sd = VideoScreen.GetComponent<RectTransform>();
+        RectTransform sd = VideoScreen.GetComponent<RectTransform>();
         VideoScreen.texture = webCamTexture;
 
         webCamTexture.Play();
@@ -70,7 +70,7 @@ public class VideoCapture : MonoBehaviour
         VideoPlayer.renderMode = VideoRenderMode.RenderTexture;
         VideoPlayer.targetTexture = videoTexture;
 
-        var sd = VideoScreen.GetComponent<RectTransform>();
+        RectTransform sd = VideoScreen.GetComponent<RectTransform>();
         sd.sizeDelta = new Vector2(videoScreenWidth, (int)(videoScreenWidth * VideoPlayer.clip.height / VideoPlayer.clip.width));
         VideoScreen.texture = videoTexture;
 
