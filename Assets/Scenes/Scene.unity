@@ -504,7 +504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0015fead31b30e44a6ac6586bfda03c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VideoScreen: {fileID: 1200076501}
+  rawImage: {fileID: 1200076501}
   VideoBackground: {fileID: 1873549732}
   VideoBackgroundScale: 1
   _layer:
