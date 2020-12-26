@@ -5,19 +5,15 @@ using Unity.Barracuda;
 
 public class BarracudaRunner : MonoBehaviour
 {
-    /// <summary>
-    /// Neural network model
-    /// </summary>
-    public NNModel NNModel;
+    public NNModel neuralNetworkModel;
+    public WorkerFactory.Type workerType = WorkerFactory.Type.Auto;
+    public bool verbose = true;
 
-    public WorkerFactory.Type WorkerType = WorkerFactory.Type.Auto;
-    public bool Verbose = true;
-
-    private Model _model;
-    private IWorker _worker;
+    private Model model;
+    private IWorker worker;
 
     /// <summary>
-    /// Coordinates of joint points
+    /// Coordinates of joint points.
     /// </summary>
     private Avatar.JointPoint[] jointPoints;
     
@@ -124,7 +120,7 @@ public class BarracudaRunner : MonoBehaviour
     /// </summary>
     public float LowPassParam;
 
-    public float WaitTimeModelLoad = 10f;
+    public float waitTimeModelLoad = 10f;
     public Texture2D baseTexture;
     public VideoCapture videoCapture;
     public Avatar VNectModel;
@@ -145,24 +141,23 @@ public class BarracudaRunner : MonoBehaviour
         unit = 1f / (float)HeatMapCol;
         InputImageSizeF = InputImageSize;
         InputImageSizeHalf = InputImageSizeF / 2f;
-        ImageScale = InputImageSize / (float)HeatMapCol;// 224f / (float)InputImageSize;
+        ImageScale = InputImageSize / (float)HeatMapCol; // 224f / (float)InputImageSize;
 
-        // Disabel sleep
+        // Disabel sleep.
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        // Init model
-        _model = ModelLoader.Load(NNModel, Verbose);
-        _worker = WorkerFactory.CreateWorker(WorkerType, _model, Verbose);
+        // Initialize model.
+        model = ModelLoader.Load(neuralNetworkModel, verbose);
+        worker = WorkerFactory.CreateWorker(workerType, model, verbose);
 
         StartCoroutine("WaitLoad");
-
     }
 
     private void Update()
     {
         if( !Lock )
         {
-            UpdateVNectModel();
+            UpdateAvatar();
         }
     }
 
@@ -173,12 +168,12 @@ public class BarracudaRunner : MonoBehaviour
         inputs[inputName_3] = new Tensor(baseTexture);
 
         // Create input and Execute model
-        yield return _worker.StartManualSchedule(inputs);
+        yield return worker.StartManualSchedule(inputs);
 
         // Get outputs
-        for( int i = 2; i < _model.outputs.Count; i++ )
+        for( int i = 2; i < model.outputs.Count; i++ )
         {
-            b_outputs[i] = _worker.PeekOutput(_model.outputs[i]);
+            b_outputs[i] = worker.PeekOutput(model.outputs[i]);
         }
 
         // Get data from outputs
@@ -196,7 +191,7 @@ public class BarracudaRunner : MonoBehaviour
 
         PredictPose();
 
-        yield return new WaitForSeconds(WaitTimeModelLoad);
+        yield return new WaitForSeconds(waitTimeModelLoad);
 
         // Init VideoCapture
         videoCapture.Initialize(InputImageSize, InputImageSize);
@@ -213,7 +208,7 @@ public class BarracudaRunner : MonoBehaviour
     private const string inputName_3 = "2";
     */
 
-    private void UpdateVNectModel()
+    private void UpdateAvatar()
     {
         input = new Tensor(videoCapture.renderTexture);
         if( inputs[inputName_1] == null )
@@ -237,7 +232,6 @@ public class BarracudaRunner : MonoBehaviour
     /// <summary>
     /// Tensor has input image
     /// </summary>
-    /// <returns></returns>
     Tensor input = new Tensor();
     Dictionary<string, Tensor> inputs = new Dictionary<string, Tensor>() { { inputName_1, null }, { inputName_2, null }, { inputName_3, null }, };
     Tensor[] b_outputs = new Tensor[4];
@@ -245,12 +239,12 @@ public class BarracudaRunner : MonoBehaviour
     private IEnumerator ExecuteModelAsync()
     {
         // Create input and Execute model
-        yield return _worker.StartManualSchedule(inputs);
+        yield return worker.StartManualSchedule(inputs);
 
         // Get outputs
-        for( int i = 2; i < _model.outputs.Count; i++ )
+        for( int i = 2; i < model.outputs.Count; i++ )
         {
-            b_outputs[i] = _worker.PeekOutput(_model.outputs[i]);
+            b_outputs[i] = worker.PeekOutput(model.outputs[i]);
         }
 
         // Get data from outputs
@@ -323,7 +317,7 @@ public class BarracudaRunner : MonoBehaviour
         // Kalman filter
         foreach( Avatar.JointPoint jp in jointPoints )
         {
-            KalmanUpdate(jp);
+            kalmanUpdate(jp);
         }
 
         // Low pass filter
@@ -343,10 +337,9 @@ public class BarracudaRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// Kalman filter
+    /// Kalman filter.
     /// </summary>
-    /// <param name="measurement">joint points</param>
-    void KalmanUpdate( Avatar.JointPoint measurement )
+    private void kalmanUpdate( Avatar.JointPoint measurement )
     {
         measurementUpdate(measurement);
         measurement.Pos3D.x = measurement.X.x + (measurement.Now3D.x - measurement.X.x) * measurement.K.x;
@@ -355,7 +348,7 @@ public class BarracudaRunner : MonoBehaviour
         measurement.X = measurement.Pos3D;
     }
 
-	void measurementUpdate( Avatar.JointPoint measurement )
+	private void measurementUpdate( Avatar.JointPoint measurement )
     {
         measurement.K.x = (measurement.P.x + KalmanParamQ) / (measurement.P.x + KalmanParamQ + KalmanParamR);
         measurement.K.y = (measurement.P.y + KalmanParamQ) / (measurement.P.y + KalmanParamQ + KalmanParamR);

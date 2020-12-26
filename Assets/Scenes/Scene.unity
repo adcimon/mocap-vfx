@@ -630,16 +630,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a27889227d895094c8cd75784aa13cc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NNModel: {fileID: 5022602860645237092, guid: 03c27c5acf3dfb5489d6b32d68546daa, type: 3}
-  WorkerType: 32768
-  Verbose: 0
+  neuralNetworkModel: {fileID: 5022602860645237092, guid: 03c27c5acf3dfb5489d6b32d68546daa,
+    type: 3}
+  workerType: 32768
+  verbose: 0
   InputImageSize: 448
   HeatMapCol: 28
   KalmanParamQ: 0.001
   KalmanParamR: 0.0015
   UseLowPassFilter: 1
   LowPassParam: 0.1
-  WaitTimeModelLoad: 5
+  waitTimeModelLoad: 5
   baseTexture: {fileID: 2800000, guid: 7322ccd0ff5309147a9faf5de7a100ae, type: 3}
   videoCapture: {fileID: 1873549733}
   VNectModel: {fileID: 1915073380}
