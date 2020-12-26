@@ -45,16 +45,6 @@ public class BarracudaRunner : MonoBehaviour
     /// </summary>
     private int HeatMapCol_Cube;
     private float ImageScale;
-
-    /// <summary>
-    /// Buffer memory has 2D heat map
-    /// </summary>
-    private float[] heatMap2D;
-
-    /// <summary>
-    /// Buffer memory has offset 2D
-    /// </summary>
-    private float[] offset2D;
     
     /// <summary>
     /// Buffer memory has 3D heat map
@@ -65,7 +55,6 @@ public class BarracudaRunner : MonoBehaviour
     /// Buffer memory hash 3D offset
     /// </summary>
     private float[] offset3D;
-    private float unit;
     
     /// <summary>
     /// Number of joints in 2D image
@@ -92,25 +81,11 @@ public class BarracudaRunner : MonoBehaviour
     /// </summary>
     private int CubeOffsetSquared;
 
-    /// <summary>
-    /// For Kalman filter parameter Q
-    /// </summary>
     public float KalmanParamQ;
-
-    /// <summary>
-    /// For Kalman filter parameter R
-    /// </summary>
     public float KalmanParamR;
 
-    /// <summary>
-    /// Use low pass filter flag
-    /// </summary>
-    public bool UseLowPassFilter;
-
-    /// <summary>
-    /// For low pass filter
-    /// </summary>
-    public float LowPassParam;
+    public bool useLowPassFilter = true;
+    public float lowPassParam = 0.1f;
 
     public float waitTimeModelLoad = 10;
     public Texture2D baseTexture;
@@ -140,11 +115,8 @@ public class BarracudaRunner : MonoBehaviour
         CubeOffsetLinear = HeatMapCol * JointNum_Cube;
         CubeOffsetSquared = HeatMapCol_Squared * JointNum_Cube;
 
-        heatMap2D = new float[JointNum * HeatMapCol_Squared];
-        offset2D = new float[JointNum * HeatMapCol_Squared * 2];
         heatMap3D = new float[JointNum * HeatMapCol_Cube];
         offset3D = new float[JointNum * HeatMapCol_Cube * 3];
-        unit = 1f / (float)HeatMapCol;
         InputImageSizeF = InputImageSize;
         InputImageSizeHalf = InputImageSizeF / 2f;
         ImageScale = InputImageSize / (float)HeatMapCol; // 224f / (float)InputImageSize;
@@ -226,20 +198,20 @@ public class BarracudaRunner : MonoBehaviour
 
     private IEnumerator ExecuteModelAsync()
     {
-        // Create input and Execute model
+        // Create input and execute model.
         yield return worker.StartManualSchedule(inputs);
 
-        // Get outputs
+        // Get outputs.
         for( int i = 2; i < model.outputs.Count; i++ )
         {
             outputs[i] = worker.PeekOutput(model.outputs[i]);
         }
 
-        // Get data from outputs
+        // Get data from outputs.
         offset3D = outputs[2].data.Download(outputs[2].shape);
         heatMap3D = outputs[3].data.Download(outputs[3].shape);
         
-        // Release outputs
+        // Release outputs.
         for( int i = 2; i < outputs.Length; i++ )
         {
             outputs[i].Dispose();
@@ -249,7 +221,7 @@ public class BarracudaRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// Predict positions of each of joints based on network
+    /// Predict positions of each of joints based on the inference.
     /// </summary>
     private void PredictPose()
     {
@@ -285,38 +257,38 @@ public class BarracudaRunner : MonoBehaviour
             jointPoints[j].Now3D.z = (offset3D[maxYIndex * CubeOffsetSquared + maxXIndex * CubeOffsetLinear + (j + JointNum_Squared) * HeatMapCol + maxZIndex] + 0.5f + (float)(maxZIndex - 14)) * ImageScale;
         }
 
-        // Calculate hip location
+        // Calculate hip location.
         var lc = (jointPoints[PositionIndex.rThighBend.Int()].Now3D + jointPoints[PositionIndex.lThighBend.Int()].Now3D) / 2f;
         jointPoints[PositionIndex.hip.Int()].Now3D = (jointPoints[PositionIndex.abdomenUpper.Int()].Now3D + lc) / 2f;
 
-        // Calculate neck location
+        // Calculate neck location.
         jointPoints[PositionIndex.neck.Int()].Now3D = (jointPoints[PositionIndex.rShldrBend.Int()].Now3D + jointPoints[PositionIndex.lShldrBend.Int()].Now3D) / 2f;
 
-        // Calculate head location
+        // Calculate head location.
         var cEar = (jointPoints[PositionIndex.rEar.Int()].Now3D + jointPoints[PositionIndex.lEar.Int()].Now3D) / 2f;
         var hv = cEar - jointPoints[PositionIndex.neck.Int()].Now3D;
         var nhv = Vector3.Normalize(hv);
         var nv = jointPoints[PositionIndex.Nose.Int()].Now3D - jointPoints[PositionIndex.neck.Int()].Now3D;
         jointPoints[PositionIndex.head.Int()].Now3D = jointPoints[PositionIndex.neck.Int()].Now3D + nhv * Vector3.Dot(nhv, nv);
 
-        // Calculate spine location
+        // Calculate spine location.
         jointPoints[PositionIndex.spine.Int()].Now3D = jointPoints[PositionIndex.abdomenUpper.Int()].Now3D;
 
-        // Kalman filter
+        // Kalman filter.
         foreach( Avatar.JointPoint jp in jointPoints )
         {
-            kalmanUpdate(jp);
+            kalmanFilter(jp);
         }
 
-        // Low pass filter
-        if( UseLowPassFilter )
+        // Low pass filter.
+        if( useLowPassFilter )
         {
             foreach( Avatar.JointPoint jp in jointPoints )
             {
                 jp.PrevPos3D[0] = jp.Pos3D;
                 for( int i = 1; i < jp.PrevPos3D.Length; i++ )
                 {
-                    jp.PrevPos3D[i] = jp.PrevPos3D[i] * LowPassParam + jp.PrevPos3D[i - 1] * (1f - LowPassParam);
+                    jp.PrevPos3D[i] = jp.PrevPos3D[i] * lowPassParam + jp.PrevPos3D[i - 1] * (1f - lowPassParam);
                 }
 
                 jp.Pos3D = jp.PrevPos3D[jp.PrevPos3D.Length - 1];
@@ -324,7 +296,7 @@ public class BarracudaRunner : MonoBehaviour
         }
     }
 
-    private void kalmanUpdate( Avatar.JointPoint measurement )
+    private void kalmanFilter( Avatar.JointPoint measurement )
     {
         measurementUpdate(measurement);
         measurement.Pos3D.x = measurement.X.x + (measurement.Now3D.x - measurement.X.x) * measurement.K.x;

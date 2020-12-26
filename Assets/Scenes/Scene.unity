@@ -760,7 +760,7 @@ MonoBehaviour:
   HeatMapCol: 28
   KalmanParamQ: 0.001
   KalmanParamR: 0.0015
-  UseLowPassFilter: 1
+  useLowPassFilter: 1
   LowPassParam: 0.1
   waitTimeModelLoad: 5
   baseTexture: {fileID: 2800000, guid: 7322ccd0ff5309147a9faf5de7a100ae, type: 3}
