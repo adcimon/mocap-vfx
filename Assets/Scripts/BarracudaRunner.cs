@@ -9,9 +9,6 @@ public class BarracudaRunner : MonoBehaviour
     public WorkerFactory.Type workerType = WorkerFactory.Type.Auto;
     public bool verbose = true;
 
-    private Model model;
-    private IWorker worker;
-
     /// <summary>
     /// Coordinates of joint points.
     /// </summary>
@@ -23,12 +20,12 @@ public class BarracudaRunner : MonoBehaviour
     private const int JointNum = 24;
 
     /// <summary>
-    /// input image size
+    /// Input image size.
     /// </summary>
     public int InputImageSize;
 
     /// <summary>
-    /// input image size (half)
+    /// Input image half size.
     /// </summary>
     private float InputImageSizeHalf;
 
@@ -106,11 +103,6 @@ public class BarracudaRunner : MonoBehaviour
     public float KalmanParamR;
 
     /// <summary>
-    /// Lock to update VNectModel
-    /// </summary>
-    private bool Lock = true;
-
-    /// <summary>
     /// Use low pass filter flag
     /// </summary>
     public bool UseLowPassFilter;
@@ -120,14 +112,28 @@ public class BarracudaRunner : MonoBehaviour
     /// </summary>
     public float LowPassParam;
 
-    public float waitTimeModelLoad = 10f;
+    public float waitTimeModelLoad = 10;
     public Texture2D baseTexture;
     public VideoCapture videoCapture;
-    public Avatar VNectModel;
+    public Avatar avatar;
+
+    private Model model;
+    private IWorker worker;
+    private bool loaded = false;
+
+    private const string inputName1 = "input.1";
+    private const string inputName2 = "input.4";
+    private const string inputName3 = "input.7";
+    //private const string inputName1 = "0";
+    //private const string inputName2 = "1";
+    //private const string inputName3 = "2";
+    private Tensor input = new Tensor();
+    private Dictionary<string, Tensor> inputs = new Dictionary<string, Tensor>() { { inputName1, null }, { inputName2, null }, { inputName3, null }, };
+    private Tensor[] outputs = new Tensor[4];
 
     private void Start()
     {
-        // Initialize 
+        // Initialize.
         HeatMapCol_Squared = HeatMapCol * HeatMapCol;
         HeatMapCol_Cube = HeatMapCol * HeatMapCol * HeatMapCol;
         HeatMapCol_JointNum = HeatMapCol * JointNum;
@@ -150,91 +156,73 @@ public class BarracudaRunner : MonoBehaviour
         model = ModelLoader.Load(neuralNetworkModel, verbose);
         worker = WorkerFactory.CreateWorker(workerType, model, verbose);
 
-        StartCoroutine("WaitLoad");
+        StartCoroutine(Load());
     }
 
     private void Update()
     {
-        if( !Lock )
+        if( loaded )
         {
             UpdateAvatar();
         }
     }
 
-    private IEnumerator WaitLoad()
+    private IEnumerator Load()
     {
-        inputs[inputName_1] = new Tensor(baseTexture);
-        inputs[inputName_2] = new Tensor(baseTexture);
-        inputs[inputName_3] = new Tensor(baseTexture);
+        inputs[inputName1] = new Tensor(baseTexture);
+        inputs[inputName2] = new Tensor(baseTexture);
+        inputs[inputName3] = new Tensor(baseTexture);
 
-        // Create input and Execute model
+        // Create input and execute model.
         yield return worker.StartManualSchedule(inputs);
 
-        // Get outputs
+        // Get outputs.
         for( int i = 2; i < model.outputs.Count; i++ )
         {
-            b_outputs[i] = worker.PeekOutput(model.outputs[i]);
+            outputs[i] = worker.PeekOutput(model.outputs[i]);
         }
 
-        // Get data from outputs
-        offset3D = b_outputs[2].data.Download(b_outputs[2].shape);
-        heatMap3D = b_outputs[3].data.Download(b_outputs[3].shape);
+        // Get data from outputs.
+        offset3D = outputs[2].data.Download(outputs[2].shape);
+        heatMap3D = outputs[3].data.Download(outputs[3].shape);
 
-        // Release outputs
-        for( int i = 2; i < b_outputs.Length; i++ )
+        // Release outputs.
+        for( int i = 2; i < outputs.Length; i++ )
         {
-            b_outputs[i].Dispose();
+            outputs[i].Dispose();
         }
 
-        // Init VNect model
-        jointPoints = VNectModel.Initialize();
+        jointPoints = avatar.Initialize();
 
         PredictPose();
 
         yield return new WaitForSeconds(waitTimeModelLoad);
 
-        // Init VideoCapture
         videoCapture.Initialize(InputImageSize, InputImageSize);
-        Lock = false;
+
+        loaded = true;
     }
-
-    private const string inputName_1 = "input.1";
-    private const string inputName_2 = "input.4";
-    private const string inputName_3 = "input.7";
-
-    /*
-    private const string inputName_1 = "0";
-    private const string inputName_2 = "1";
-    private const string inputName_3 = "2";
-    */
 
     private void UpdateAvatar()
     {
         input = new Tensor(videoCapture.renderTexture);
-        if( inputs[inputName_1] == null )
+        if( inputs[inputName1] == null )
         {
-            inputs[inputName_1] = input;
-            inputs[inputName_2] = new Tensor(videoCapture.renderTexture);
-            inputs[inputName_3] = new Tensor(videoCapture.renderTexture);
+            inputs[inputName1] = input;
+            inputs[inputName2] = new Tensor(videoCapture.renderTexture);
+            inputs[inputName3] = new Tensor(videoCapture.renderTexture);
         }
         else
         {
-            inputs[inputName_3].Dispose();
+            inputs[inputName3].Dispose();
 
-            inputs[inputName_3] = inputs[inputName_2];
-            inputs[inputName_2] = inputs[inputName_1];
-            inputs[inputName_1] = input;
+            inputs[inputName3] = inputs[inputName2];
+            inputs[inputName2] = inputs[inputName1];
+            inputs[inputName1] = input;
         }
 
         StartCoroutine(ExecuteModelAsync());
     }
-
-    /// <summary>
-    /// Tensor has input image
-    /// </summary>
-    Tensor input = new Tensor();
-    Dictionary<string, Tensor> inputs = new Dictionary<string, Tensor>() { { inputName_1, null }, { inputName_2, null }, { inputName_3, null }, };
-    Tensor[] b_outputs = new Tensor[4];
 
     private IEnumerator ExecuteModelAsync()
     {
@@ -244,17 +232,17 @@ public class BarracudaRunner : MonoBehaviour
         // Get outputs
         for( int i = 2; i < model.outputs.Count; i++ )
         {
-            b_outputs[i] = worker.PeekOutput(model.outputs[i]);
+            outputs[i] = worker.PeekOutput(model.outputs[i]);
         }
 
         // Get data from outputs
-        offset3D = b_outputs[2].data.Download(b_outputs[2].shape);
-        heatMap3D = b_outputs[3].data.Download(b_outputs[3].shape);
+        offset3D = outputs[2].data.Download(outputs[2].shape);
+        heatMap3D = outputs[3].data.Download(outputs[3].shape);
         
         // Release outputs
-        for( int i = 2; i < b_outputs.Length; i++ )
+        for( int i = 2; i < outputs.Length; i++ )
         {
-            b_outputs[i].Dispose();
+            outputs[i].Dispose();
         }
 
         PredictPose();
@@ -336,9 +324,6 @@ public class BarracudaRunner : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Kalman filter.
-    /// </summary>
     private void kalmanUpdate( Avatar.JointPoint measurement )
     {
         measurementUpdate(measurement);
