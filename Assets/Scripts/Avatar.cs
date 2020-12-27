@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Position index of joint points.
+/// Position index of the joint points.
 /// </summary>
 public enum PositionIndex : int
 {
@@ -56,37 +56,29 @@ public static partial class EnumExtend
 
 public class Avatar : MonoBehaviour
 {
-    public class Skeleton
-    {
-        public GameObject LineObject;
-        public LineRenderer Line;
-        public JointPoint start = null;
-        public JointPoint end = null;
-    }
-
     public bool showSkeleton = true;
     public Material skeletonMaterial;
-    public float SkeletonX;
-    public float SkeletonY;
-    public float SkeletonZ;
-    public float SkeletonScale;
-    private List<Skeleton> Skeletons = new List<Skeleton>();
+    public float skeletonX;
+    public float skeletonY;
+    public float skeletonZ;
+    public float skeletonScale = 1;
+    private GameObject skeleton;
+    private List<Skeleton> skeletons = new List<Skeleton>();
 
-    // Joint positions and bones.
+    public GameObject nose;
     public JointPoint[] jointPoints;
-    public JointPoint[] JointPoints { get { return jointPoints; } }
 
-    // Initial center position.
-    private Vector3 initPosition;
-
-    public GameObject Nose;
     private Animator animator;
-
-    // Move in z direction.
+    private Vector3 initPosition;
     private float centerTall = 224 * 0.75f;
     private float tall = 224 * 0.75f;
     private float prevTall = 224 * 0.75f;
-    public float ZScale = 0.8f;
+    public float zScale = 0.8f;
+
+    private void Start()
+    {
+        skeleton = new GameObject("Skeleton");
+    }
 
     private void Update()
     {
@@ -128,7 +120,7 @@ public class Avatar : MonoBehaviour
         jointPoints[PositionIndex.lEye.Int()].Transform = animator.GetBoneTransform(HumanBodyBones.LeftEye);
         jointPoints[PositionIndex.rEar.Int()].Transform = animator.GetBoneTransform(HumanBodyBones.Head);
         jointPoints[PositionIndex.rEye.Int()].Transform = animator.GetBoneTransform(HumanBodyBones.RightEye);
-        jointPoints[PositionIndex.Nose.Int()].Transform = Nose.transform;
+        jointPoints[PositionIndex.Nose.Int()].Transform = nose.transform;
 
         // Right leg.
         jointPoints[PositionIndex.rThighBend.Int()].Transform = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
@@ -270,7 +262,7 @@ public class Avatar : MonoBehaviour
         jointPoints[PositionIndex.head.Int()].score3D = 1f;
         jointPoints[PositionIndex.spine.Int()].score3D = 1f;
 
-        return JointPoints;
+        return jointPoints;
     }
 
     public void PoseUpdate()
@@ -297,7 +289,7 @@ public class Avatar : MonoBehaviour
             tall = centerTall;
         }
 
-        float dz = (centerTall - tall) / centerTall * ZScale;
+        float dz = (centerTall - tall) / centerTall * zScale;
 
         // Movement and rotatation of center.
         Vector3 forward = TriangleNormal(jointPoints[PositionIndex.hip.Int()].Pos3D, jointPoints[PositionIndex.lThighBend.Int()].Pos3D, jointPoints[PositionIndex.rThighBend.Int()].Pos3D);
@@ -334,13 +326,13 @@ public class Avatar : MonoBehaviour
         //rHand.Transform.rotation = Quaternion.LookRotation(jointPoints[PositionIndex.rThumb2.Int()].Pos3D - jointPoints[PositionIndex.rMid1.Int()].Pos3D, rf) * rHand.InverseRotation;
         rHand.Transform.rotation = Quaternion.LookRotation(jointPoints[PositionIndex.rThumb2.Int()].Pos3D - jointPoints[PositionIndex.rMid1.Int()].Pos3D, rf) * rHand.InverseRotation;
 
-        foreach( Skeleton sk in Skeletons )
+        foreach( Skeleton sk in skeletons )
         {
             JointPoint s = sk.start;
             JointPoint e = sk.end;
 
-            sk.Line.SetPosition(0, new Vector3(s.Pos3D.x * SkeletonScale + SkeletonX, s.Pos3D.y * SkeletonScale + SkeletonY, s.Pos3D.z * SkeletonScale + SkeletonZ));
-            sk.Line.SetPosition(1, new Vector3(e.Pos3D.x * SkeletonScale + SkeletonX, e.Pos3D.y * SkeletonScale + SkeletonY, e.Pos3D.z * SkeletonScale + SkeletonZ));
+            sk.lineRenderer.SetPosition(0, new Vector3(s.Pos3D.x * skeletonScale + skeletonX, s.Pos3D.y * skeletonScale + skeletonY, s.Pos3D.z * skeletonScale + skeletonZ));
+            sk.lineRenderer.SetPosition(1, new Vector3(e.Pos3D.x * skeletonScale + skeletonX, e.Pos3D.y * skeletonScale + skeletonY, e.Pos3D.z * skeletonScale + skeletonZ));
         }
     }
 
@@ -367,19 +359,20 @@ public class Avatar : MonoBehaviour
     {
         Skeleton sk = new Skeleton()
         {
-            LineObject = new GameObject("Line"),
+            gameObject = new GameObject("Line"),
             start = jointPoints[s.Int()],
             end = jointPoints[e.Int()],
         };
 
-        sk.Line = sk.LineObject.AddComponent<LineRenderer>();
-        sk.Line.startWidth = 0.04f;
-        sk.Line.endWidth = 0.01f;
+        sk.gameObject.transform.SetParent(skeleton.transform);
+        sk.lineRenderer = sk.gameObject.AddComponent<LineRenderer>();
+        sk.lineRenderer.startWidth = 0.04f;
+        sk.lineRenderer.endWidth = 0.01f;
         
         // Define the number of vertices.
-        sk.Line.positionCount = 2;
-        sk.Line.material = skeletonMaterial;
+        sk.lineRenderer.positionCount = 2;
+        sk.lineRenderer.material = skeletonMaterial;
 
-        Skeletons.Add(sk);
+        skeletons.Add(sk);
     }
 }

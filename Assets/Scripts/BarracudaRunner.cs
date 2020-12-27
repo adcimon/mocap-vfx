@@ -7,6 +7,7 @@ public class BarracudaRunner : MonoBehaviour
 {
     public NNModel neuralNetworkModel;
     public WorkerFactory.Type workerType = WorkerFactory.Type.Auto;
+    public float waitTime = 10;
     public bool verbose = true;
 
     /// <summary>
@@ -26,6 +27,7 @@ public class BarracudaRunner : MonoBehaviour
     /// </summary>
     public int inputImageSize;
     private float inputImageHalfSize { get { return (float)inputImageSize / 2f; } }
+    private float imageScale { get { return inputImageSize / (float)heatMapCol; } } // 224f / (float)InputImageSize;
 
     /// <summary>
     /// Column number of heatmap.
@@ -34,46 +36,39 @@ public class BarracudaRunner : MonoBehaviour
     private int heatMapColSquared { get { return heatMapCol * heatMapCol; } }
     private int heatMapColCube { get { return heatMapCol * heatMapCol * heatMapCol; } }
 
-    private float imageScale { get { return inputImageSize / (float)heatMapCol; } } // 224f / (float)InputImageSize;
-
     /// <summary>
-    /// Buffer memory has 3D heat map
+    /// Kalman filter parameter Q.
     /// </summary>
-    private float[] heatMap3D;
-    
-    /// <summary>
-    /// Buffer memory hash 3D offset
-    /// </summary>
-    private float[] offset3D;
-
-    private int heatMapColxJointNum { get { return heatMapCol * jointNum; } }
-    private int cubeOffsetLinear { get { return heatMapCol * jointNumCube; } }
-    private int cubeOffsetSquared { get { return heatMapColSquared * jointNumCube; } }
-
     public float kalmanParamQ;
+
+    /// <summary>
+    /// Kalman filter parameter R.
+    /// </summary>
     public float kalmanParamR;
 
     public bool useLowPassFilter = true;
     public float lowPassParam = 0.1f;
 
-    public float waitTimeModelLoad = 10;
     public Texture2D baseTexture;
     public VideoCapture videoCapture;
     public Avatar avatar;
 
-    private Model model;
-    private IWorker worker;
-    private bool loaded = false;
+    private float[] heatMap3D;
+    private float[] offset3D;
+    private int heatMapColxJointNum { get { return heatMapCol * jointNum; } }
+    private int cubeOffsetLinear { get { return heatMapCol * jointNumCube; } }
+    private int cubeOffsetSquared { get { return heatMapColSquared * jointNumCube; } }
 
     private const string inputName1 = "input.1";
     private const string inputName2 = "input.4";
     private const string inputName3 = "input.7";
-    //private const string inputName1 = "0";
-    //private const string inputName2 = "1";
-    //private const string inputName3 = "2";
     private Tensor input = new Tensor();
     private Dictionary<string, Tensor> inputs = new Dictionary<string, Tensor>() { { inputName1, null }, { inputName2, null }, { inputName3, null }, };
     private Tensor[] outputs = new Tensor[4];
+
+    private Model model;
+    private IWorker worker;
+    private bool loaded = false;
 
     private void Start()
     {
@@ -127,7 +122,7 @@ public class BarracudaRunner : MonoBehaviour
 
         PredictPose();
 
-        yield return new WaitForSeconds(waitTimeModelLoad);
+        yield return new WaitForSeconds(waitTime);
 
         videoCapture.Initialize(inputImageSize, inputImageSize);
 
