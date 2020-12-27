@@ -11,11 +11,6 @@ public class BarracudaRunner : MonoBehaviour
     public bool verbose = true;
 
     /// <summary>
-    /// Coordinates of joint points.
-    /// </summary>
-    private JointPoint[] jointPoints;
-
-    /// <summary>
     /// Number of joint points.
     /// </summary>
     private const int jointNum = 24;
@@ -78,7 +73,7 @@ public class BarracudaRunner : MonoBehaviour
         // Disabel sleep.
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        // Initialize model.
+        // Initialize the model.
         model = ModelLoader.Load(neuralNetworkModel, verbose);
         worker = WorkerFactory.CreateWorker(workerType, model, verbose);
 
@@ -117,8 +112,6 @@ public class BarracudaRunner : MonoBehaviour
         {
             outputs[i].Dispose();
         }
-
-        jointPoints = avatar.Initialize();
 
         PredictPose();
 
@@ -181,7 +174,7 @@ public class BarracudaRunner : MonoBehaviour
             int maxXIndex = 0;
             int maxYIndex = 0;
             int maxZIndex = 0;
-            jointPoints[j].score3D = 0.0f;
+            avatar.jointPoints[j].score3D = 0.0f;
             int jj = j * heatMapCol;
             for( int z = 0; z < heatMapCol; z++ )
             {
@@ -192,9 +185,9 @@ public class BarracudaRunner : MonoBehaviour
                     for( int x = 0; x < heatMapCol; x++ )
                     {
                         float v = heatMap3D[yy + x * heatMapColxJointNum];
-                        if( v > jointPoints[j].score3D )
+                        if( v > avatar.jointPoints[j].score3D )
                         {
-                            jointPoints[j].score3D = v;
+                            avatar.jointPoints[j].score3D = v;
                             maxXIndex = x;
                             maxYIndex = y;
                             maxZIndex = z;
@@ -203,30 +196,30 @@ public class BarracudaRunner : MonoBehaviour
                 }
             }
            
-            jointPoints[j].now3D.x = (offset3D[maxYIndex * cubeOffsetSquared + maxXIndex * cubeOffsetLinear + j * heatMapCol + maxZIndex] + 0.5f + (float)maxXIndex) * imageScale - inputImageHalfSize;
-            jointPoints[j].now3D.y = inputImageHalfSize - (offset3D[maxYIndex * cubeOffsetSquared + maxXIndex * cubeOffsetLinear + (j + jointNum) * heatMapCol + maxZIndex] + 0.5f + (float)maxYIndex) * imageScale;
-            jointPoints[j].now3D.z = (offset3D[maxYIndex * cubeOffsetSquared + maxXIndex * cubeOffsetLinear + (j + jointNumSquared) * heatMapCol + maxZIndex] + 0.5f + (float)(maxZIndex - 14)) * imageScale;
+            avatar.jointPoints[j].now3D.x = (offset3D[maxYIndex * cubeOffsetSquared + maxXIndex * cubeOffsetLinear + j * heatMapCol + maxZIndex] + 0.5f + (float)maxXIndex) * imageScale - inputImageHalfSize;
+            avatar.jointPoints[j].now3D.y = inputImageHalfSize - (offset3D[maxYIndex * cubeOffsetSquared + maxXIndex * cubeOffsetLinear + (j + jointNum) * heatMapCol + maxZIndex] + 0.5f + (float)maxYIndex) * imageScale;
+            avatar.jointPoints[j].now3D.z = (offset3D[maxYIndex * cubeOffsetSquared + maxXIndex * cubeOffsetLinear + (j + jointNumSquared) * heatMapCol + maxZIndex] + 0.5f + (float)(maxZIndex - 14)) * imageScale;
         }
 
         // Calculate hip location.
-        Vector3 lc = (jointPoints[PositionIndex.RightThighBend.Int()].now3D + jointPoints[PositionIndex.LeftThighBend.Int()].now3D) / 2f;
-        jointPoints[PositionIndex.Hip.Int()].now3D = (jointPoints[PositionIndex.AbdomenUpper.Int()].now3D + lc) / 2f;
+        Vector3 lc = (avatar.jointPoints[PositionIndex.RightThighBend.Int()].now3D + avatar.jointPoints[PositionIndex.LeftThighBend.Int()].now3D) / 2f;
+        avatar.jointPoints[PositionIndex.Hip.Int()].now3D = (avatar.jointPoints[PositionIndex.AbdomenUpper.Int()].now3D + lc) / 2f;
 
         // Calculate neck location.
-        jointPoints[PositionIndex.Neck.Int()].now3D = (jointPoints[PositionIndex.RightShoulderBend.Int()].now3D + jointPoints[PositionIndex.LeftShoulderBend.Int()].now3D) / 2f;
+        avatar.jointPoints[PositionIndex.Neck.Int()].now3D = (avatar.jointPoints[PositionIndex.RightShoulderBend.Int()].now3D + avatar.jointPoints[PositionIndex.LeftShoulderBend.Int()].now3D) / 2f;
 
         // Calculate head location.
-        Vector3 cEar = (jointPoints[PositionIndex.RightEar.Int()].now3D + jointPoints[PositionIndex.LeftEar.Int()].now3D) / 2f;
-        Vector3 hv = cEar - jointPoints[PositionIndex.Neck.Int()].now3D;
+        Vector3 cEar = (avatar.jointPoints[PositionIndex.RightEar.Int()].now3D + avatar.jointPoints[PositionIndex.LeftEar.Int()].now3D) / 2f;
+        Vector3 hv = cEar - avatar.jointPoints[PositionIndex.Neck.Int()].now3D;
         Vector3 nhv = Vector3.Normalize(hv);
-        Vector3 nv = jointPoints[PositionIndex.Nose.Int()].now3D - jointPoints[PositionIndex.Neck.Int()].now3D;
-        jointPoints[PositionIndex.Head.Int()].now3D = jointPoints[PositionIndex.Neck.Int()].now3D + nhv * Vector3.Dot(nhv, nv);
+        Vector3 nv = avatar.jointPoints[PositionIndex.Nose.Int()].now3D - avatar.jointPoints[PositionIndex.Neck.Int()].now3D;
+        avatar.jointPoints[PositionIndex.Head.Int()].now3D = avatar.jointPoints[PositionIndex.Neck.Int()].now3D + nhv * Vector3.Dot(nhv, nv);
 
         // Calculate spine location.
-        jointPoints[PositionIndex.Spine.Int()].now3D = jointPoints[PositionIndex.AbdomenUpper.Int()].now3D;
+        avatar.jointPoints[PositionIndex.Spine.Int()].now3D = avatar.jointPoints[PositionIndex.AbdomenUpper.Int()].now3D;
 
         // Kalman filter.
-        foreach( JointPoint jp in jointPoints )
+        foreach( JointPoint jp in avatar.jointPoints )
         {
             KalmanFilter(jp);
         }
@@ -234,7 +227,7 @@ public class BarracudaRunner : MonoBehaviour
         // Low pass filter.
         if( useLowPassFilter )
         {
-            foreach( JointPoint jp in jointPoints )
+            foreach( JointPoint jp in avatar.jointPoints )
             {
                 jp.prevPos3D[0] = jp.pos3D;
                 for( int i = 1; i < jp.prevPos3D.Length; i++ )

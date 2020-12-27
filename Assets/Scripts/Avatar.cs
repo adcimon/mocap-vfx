@@ -20,23 +20,22 @@ public class Avatar : MonoBehaviour
     private float centerTall = 224 * 0.75f;
     private float tall = 224 * 0.75f;
     private float prevTall = 224 * 0.75f;
-    public float zScale = 0.8f;
+    private float zScale = 1;
 
-    private void Start()
+    private void Awake()
     {
         skeleton = new GameObject("Skeleton");
         animator = this.GetComponent<Animator>();
+
+        Initialize();
     }
 
     private void Update()
     {
-        if( jointPoints != null )
-        {
-            PoseUpdate();
-        }
+        PoseUpdate();
     }
 
-    public JointPoint[] Initialize()
+    public void Initialize()
     {
         jointPoints = new JointPoint[PositionIndex.Count.Int()];
         for( int i = 0; i < PositionIndex.Count.Int(); i++ )
@@ -113,7 +112,7 @@ public class Avatar : MonoBehaviour
         // Etc.
         jointPoints[PositionIndex.Spine.Int()].child = jointPoints[PositionIndex.Neck.Int()];
         jointPoints[PositionIndex.Neck.Int()].child = jointPoints[PositionIndex.Head.Int()];
-        //jointPoints[PositionIndex.head.Int()].child = jointPoints[PositionIndex.Nose.Int()];
+        //jointPoints[PositionIndex.Head.Int()].child = jointPoints[PositionIndex.Nose.Int()];
 
         if( showSkeleton )
         {
@@ -205,8 +204,6 @@ public class Avatar : MonoBehaviour
         jointPoints[PositionIndex.Nose.Int()].score3D = 1f;
         jointPoints[PositionIndex.Head.Int()].score3D = 1f;
         jointPoints[PositionIndex.Spine.Int()].score3D = 1f;
-
-        return jointPoints;
     }
 
     public void PoseUpdate()
