@@ -4,25 +4,25 @@ using UnityEngine;
 [Serializable]
 public class JointPoint
 {
-    public Vector2 Pos2D = new Vector2();
+    public Vector2 pos2D = new Vector2();
     public float score2D;
 
-    public Vector3 Pos3D = new Vector3();
-    public Vector3 Now3D = new Vector3();
-    public Vector3[] PrevPos3D = new Vector3[6];
+    public Vector3 pos3D = new Vector3();
+    public Vector3 now3D = new Vector3();
+    public Vector3[] prevPos3D = new Vector3[6];
     public float score3D;
 
     // Bones.
-    public Transform Transform = null;
-    public Quaternion InitRotation;
-    public Quaternion Inverse;
-    public Quaternion InverseRotation;
+    public Transform transform;
+    public Quaternion initRotation;
+    public Quaternion inverse;
+    public Quaternion inverseRotation;
 
-    public JointPoint Child = null;
-    public JointPoint Parent = null;
+    public JointPoint child;
+    public JointPoint parent;
 
-    // For Kalman filter.
-    public Vector3 P = new Vector3();
-    public Vector3 X = new Vector3();
-    public Vector3 K = new Vector3();
+    // Kalman filter.
+    public Vector3 p = new Vector3();
+    public Vector3 x = new Vector3();
+    public Vector3 k = new Vector3();
 }

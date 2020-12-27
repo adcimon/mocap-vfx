@@ -24,9 +24,6 @@ public class VideoCapture : MonoBehaviour
         videoPlayer = this.GetComponent<VideoPlayer>();
     }
 
-    /// <summary>
-    /// Initialize the capture.
-    /// </summary>
     public void Initialize( int width, int height )
     {
         this.width = width;
@@ -42,9 +39,6 @@ public class VideoCapture : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Play web camera.
-    /// </summary>
     private void PlayWebCamera()
     {
         WebCamDevice[] devices = WebCamTexture.devices;
@@ -68,9 +62,6 @@ public class VideoCapture : MonoBehaviour
         InitializeTexture();
     }
 
-    /// <summary>
-    /// Play video.
-    /// </summary>
     private void PlayVideo()
     {
         videoTexture = new RenderTexture((int)videoPlayer.clip.width, (int)videoPlayer.clip.height, 24);
@@ -92,9 +83,6 @@ public class VideoCapture : MonoBehaviour
         InitializeTexture();
     }
 
-    /// <summary>
-    /// Initialize texture.
-    /// </summary>
     private void InitializeTexture()
     {
         GameObject go = new GameObject("Camera", typeof(Camera));
