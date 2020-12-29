@@ -1243,18 +1243,6 @@ Transform:
   m_Father: {fileID: 568415602}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &945530857 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 5822821947120931875, guid: 7b39edff83eba6b48b1ddca7800ad290,
-    type: 3}
-  m_PrefabInstance: {fileID: 1915073378}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &979812784 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2898355158428612036, guid: 7b39edff83eba6b48b1ddca7800ad290,
-    type: 3}
-  m_PrefabInstance: {fileID: 1915073378}
-  m_PrefabAsset: {fileID: 0}
 --- !u!115 &1030116907
 MonoScript:
   m_ObjectHideFlags: 0
@@ -1803,17 +1791,39 @@ MonoBehaviour:
   skeletonY: 0.9
   skeletonZ: 0
   skeletonScale: 0.006
-  nose: {fileID: 1622233570}
+  nose: {fileID: 1622233573}
   jointPoints: []
---- !u!1 &1622233570 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2898355158428612036, guid: f103899748329a345826dc656a03df38,
+--- !u!137 &1622233570 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1630794972795428178, guid: f103899748329a345826dc656a03df38,
     type: 3}
   m_PrefabInstance: {fileID: 1622233567}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1622233571 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f103899748329a345826dc656a03df38,
+    type: 3}
+  m_PrefabInstance: {fileID: 1622233567}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1622233572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622233568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8be8853279617ea196652fe43520855, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sources:
+  - {fileID: 1622233570}
+  _pointCount: 65536
+  _compute: {fileID: 7200000, guid: feda2e5c3aa86f2d4865487ae1f2e229, type: 3}
+--- !u!1 &1622233573 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 727340024049464150, guid: f103899748329a345826dc656a03df38,
     type: 3}
   m_PrefabInstance: {fileID: 1622233567}
   m_PrefabAsset: {fileID: 0}
@@ -2232,7 +2242,7 @@ MonoBehaviour:
   skeletonY: 0.9
   skeletonZ: 0
   skeletonScale: 0.006
-  nose: {fileID: 979812784}
+  nose: {fileID: 1915073384}
   jointPoints: []
 --- !u!114 &1915073381
 MonoBehaviour:
@@ -2247,12 +2257,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sources:
-  - {fileID: 945530857}
+  - {fileID: 1915073383}
   _pointCount: 65536
   _compute: {fileID: 7200000, guid: feda2e5c3aa86f2d4865487ae1f2e229, type: 3}
 --- !u!4 &1915073382 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b39edff83eba6b48b1ddca7800ad290,
+    type: 3}
+  m_PrefabInstance: {fileID: 1915073378}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &1915073383 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1630794972795428178, guid: 7b39edff83eba6b48b1ddca7800ad290,
+    type: 3}
+  m_PrefabInstance: {fileID: 1915073378}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1915073384 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 727340024049464150, guid: 7b39edff83eba6b48b1ddca7800ad290,
     type: 3}
   m_PrefabInstance: {fileID: 1915073378}
   m_PrefabAsset: {fileID: 0}
