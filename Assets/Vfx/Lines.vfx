@@ -2250,7 +2250,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 512
+      m_SerializableObject: 200
     m_Space: 2147483647
   m_Property:
     name: Count
@@ -2654,7 +2654,7 @@ MonoBehaviour:
   - {fileID: 8926484042661615300}
   - {fileID: 8926484042661615313}
   dataType: 0
-  capacity: 512
+  capacity: 200
   stripCapacity: 16
   particlePerStripCount: 16
   m_Space: 0
@@ -3657,9 +3657,9 @@ MonoBehaviour:
   - {fileID: 8926484042661615333}
   - {fileID: 8926484042661615335}
   dataType: 1
-  capacity: 65536
-  stripCapacity: 512
-  particlePerStripCount: 128
+  capacity: 20000
+  stripCapacity: 200
+  particlePerStripCount: 100
   m_Space: 0
 --- !u!114 &8926484042661615332
 MonoBehaviour:
@@ -3877,7 +3877,7 @@ MonoBehaviour:
   - {fileID: 8926484042661615343}
   - {fileID: 8926484042661615347}
   m_OutputSlots: []
-  m_Disabled: 0
+  m_Disabled: 1
   attribute: velocity
   Composition: 0
   SampleMode: 6

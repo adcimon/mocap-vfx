@@ -3612,7 +3612,7 @@ MonoBehaviour:
   m_InputSlots:
   - {fileID: 8926484042661614734}
   m_OutputSlots: []
-  m_Disabled: 0
+  m_Disabled: 1
   attribute: color
   Composition: 1
   Source: 0
@@ -3809,7 +3809,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"r":67.79351806640625,"g":13.13277530670166,"b":3.549398899078369,"a":0.0}'
+      m_SerializableObject: '{"r":8.474186897277832,"g":1.6415964365005494,"b":0.4436747133731842,"a":0.0}'
     m_Space: 2147483647
   m_Property:
     name: 

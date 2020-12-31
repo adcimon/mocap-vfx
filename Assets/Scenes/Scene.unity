@@ -123,6 +123,20 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!115 &27465617
+MonoScript:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 5
+  m_Script: 
+  m_DefaultReferences: {}
+  m_Icon: {fileID: 0}
+  m_ExecutionOrder: 0
+  m_ClassName: VFXSkinnedMeshBinder
+  m_Namespace: Smrvfx
 --- !u!1 &307651365
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,7 +279,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 307651365}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1390634582}
+  m_Script: {fileID: 27465617}
   m_Name: 
   m_EditorClassIdentifier: 
   _positionMapProperty:
@@ -279,7 +293,7 @@ MonoBehaviour:
   _bindVertexCount: 0
   _vertexCountProperty:
     m_Name: VertexCount
-  Target: {fileID: 1915073381}
+  Target: {fileID: 1622233572}
 --- !u!1 &338605487
 GameObject:
   m_ObjectHideFlags: 0
@@ -1440,7 +1454,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1519,7 +1533,7 @@ VFXRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1566228832}
   m_Enabled: 0
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_MotionVectors: 0
@@ -1530,7 +1544,6 @@ VFXRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -1785,7 +1798,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3558338e378282c4a91d1a3356b57301, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showSkeleton: 1
+  showSkeleton: 0
   skeletonMaterial: {fileID: 2100000, guid: f8188c9479a7aad41b7448fe5eeed839, type: 2}
   skeletonX: -1
   skeletonY: 0.9
@@ -2027,7 +2040,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1873549732}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 15588459e6605c2489744026931a299e, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: bd6a7a100248a9348920b81aaed91be4, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -2181,6 +2194,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: c4a6569f7256cc546b6553710ffa0407, type: 2}
+    - target: {fileID: -7252228434403314338, guid: 7b39edff83eba6b48b1ddca7800ad290,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 7b39edff83eba6b48b1ddca7800ad290,
         type: 3}
       propertyPath: m_Name
@@ -2189,6 +2207,11 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 7b39edff83eba6b48b1ddca7800ad290,
         type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1630794972795428178, guid: 7b39edff83eba6b48b1ddca7800ad290,
+        type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5822821947120931875, guid: 7b39edff83eba6b48b1ddca7800ad290,
@@ -2236,7 +2259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3558338e378282c4a91d1a3356b57301, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showSkeleton: 1
+  showSkeleton: 0
   skeletonMaterial: {fileID: 2100000, guid: f8188c9479a7aad41b7448fe5eeed839, type: 2}
   skeletonX: -1
   skeletonY: 0.9
