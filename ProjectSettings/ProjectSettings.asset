@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: unity-barracuda-mocap
+  productName: unity-barracuda-mocap-vfx
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -771,7 +771,7 @@ PlayerSettings:
   cloudProjectId: 9ec67797-6b57-4ea0-971b-9323d19d5732
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: unity-barracuda-mocap
+  projectName: unity-barracuda-mocap-vfx
   organizationId: DefaultCompany
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
