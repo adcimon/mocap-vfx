@@ -1,5 +1,5 @@
 # Unity Barracuda MoCap VFX
 
-Unity project of 3D pose estimation with VFX using [Barracuda](https://github.com/Unity-Technologies/barracuda-release) and [Smrvfx](https://github.com/keijiro/Smrvfx).
+Unity project of 3D pose estimation with VFX using [Barracuda](https://github.com/Unity-Technologies/barracuda-release) and [VFX Graph](https://unity.com/visual-effect-graph).
 
-This project is a fork of [ThreeDPoseUnityBarracuda](https://github.com/digital-standard/ThreeDPoseUnityBarracuda) implemented under their [license](https://github.com/digital-standard/ThreeDPoseUnityBarracuda/blob/master/README.md#license) terms. Credits to [Digital-Standard Co, Ltd](https://digital-standard.com/).
+This project is a fork of [ThreeDPoseUnityBarracuda](https://github.com/digital-standard/ThreeDPoseUnityBarracuda) implemented under their [license](https://github.com/digital-standard/ThreeDPoseUnityBarracuda/blob/master/README.md#license) terms and uses [Smrvfx](https://github.com/keijiro/Smrvfx). Credits to [Digital-Standard Co, Ltd](https://digital-standard.com/) and [Keijiro Takahashi](https://github.com/keijiro).
