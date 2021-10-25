@@ -1,4 +1,4 @@
-# Unity Barracuda MoCap VFX
+# MoCap VFX
 
 Unity project of 3D pose estimation with VFX using [Barracuda](https://github.com/Unity-Technologies/barracuda-release) and [VFX Graph](https://unity.com/visual-effect-graph).
 
